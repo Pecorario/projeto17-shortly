@@ -241,13 +241,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: -; Owner: -
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL ON TABLES  TO PUBLIC;
-
-
---
 -- PostgreSQL database dump complete
 --
 
