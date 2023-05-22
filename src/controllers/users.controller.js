@@ -66,7 +66,7 @@ export async function login(req, res, next) {
     await db.query(
       `
         INSERT INTO sessions ("userId", token)
-          VALUES ($1, $2, $3)
+          VALUES ($1, $2);
       `, [userExists.rows[0].id, token]);
 
     return res.status(200).send({ token: token });
