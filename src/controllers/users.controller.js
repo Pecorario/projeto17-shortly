@@ -17,16 +17,16 @@ export async function createUser(req, res) {
   const { name, email, password } = req.body;
 
   try {
-    const dateNow = new Date();
+    // const dateNow = new Date();
     const hash = bcrypt.hashSync(password, 10);
 
     await db.query(`
       INSERT INTO users 
       (
-        name, email, password, "linksCount", "visitCount", "createdAt"
+        name, email, password, "linksCount", "visitCount"
       ) 
-      VALUES ($1, $2, $3, 0, 0, $4)
-    `, [name, email, hash, dateNow]);
+      VALUES ($1, $2, $3, 0, 0)
+    `, [name, email, hash]);
 
     return res.sendStatus(201);
   } catch (error) {
@@ -61,13 +61,13 @@ export async function login(req, res, next) {
     if (sessionExists.rowCount > 0) await db.query(`DELETE FROM sessions WHERE id=$1`, [sessionExists.rows[0].id]);
 
     const token = uuid();
-    const dateNow = new Date();
+    // const dateNow = new Date();
 
     await db.query(
       `
-        INSERT INTO sessions ("userId", token, "createdAt")
+        INSERT INTO sessions ("userId", token)
           VALUES ($1, $2, $3)
-      `, [userExists.rows[0].id, token, dateNow]);
+      `, [userExists.rows[0].id, token]);
 
     return res.status(200).send({ token: token });
   } catch (error) {

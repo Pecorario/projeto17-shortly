@@ -9,13 +9,13 @@ export async function createShortenLink(req, res) {
   try {
     const nanoid = customAlphabet('1234567890abcdef', 8)
     const shortUrl = nanoid();
-    const dateNow = new Date();
+    // const dateNow = new Date();
 
     const response = await db.query(
       `
-        INSERT INTO links ("userId", url, "shortUrl", "visitCount", "createdAt")
-        VALUES ($1, $2, $3, 0, $4) RETURNING id, "shortUrl";
-      `, [userId, url, shortUrl, dateNow]);
+        INSERT INTO links ("userId", url, "shortUrl", "visitCount")
+        VALUES ($1, $2, $3, 0) RETURNING id, "shortUrl";
+      `, [userId, url, shortUrl]);
 
     return res.status(201).send(response.rows[0]);
   } catch (error) {
