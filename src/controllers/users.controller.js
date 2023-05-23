@@ -3,9 +3,28 @@ import { v4 as uuid } from "uuid"
 
 import { db } from "../database/database.connection.js"
 
-export async function getAllUsers(req, res) {
+export async function getMyUser(req, res) {
+  const { userId } = res.locals.session;
+
   try {
-    const users = await db.query(`SELECT * FROM users;`);
+    const users = await db.query(`SELECT id, name, "visitCount" FROM users WHERE id=$1;`, [userId]);
+
+    const shortenedUrls = await db.query(`SELECT id, "shortUrl", url, "visitCount" FROM links WHERE "userId"=$1`, [userId]);
+
+    const body = {
+      ...users.rows[0],
+      shortenedUrls: shortenedUrls.rows
+    }
+
+    return res.send(body);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+export async function getRanking(req, res) {
+  try {
+    const users = await db.query(`SELECT id, name, "visitCount", "linksCount" FROM users ORDER BY "visitCount" DESC LIMIT 10 ;`,);
 
     return res.send(users.rows);
   } catch (error) {
@@ -17,7 +36,6 @@ export async function createUser(req, res) {
   const { name, email, password } = req.body;
 
   try {
-    // const dateNow = new Date();
     const hash = bcrypt.hashSync(password, 10);
 
     await db.query(`
@@ -61,7 +79,6 @@ export async function login(req, res, next) {
     if (sessionExists.rowCount > 0) await db.query(`DELETE FROM sessions WHERE id=$1`, [sessionExists.rows[0].id]);
 
     const token = uuid();
-    // const dateNow = new Date();
 
     await db.query(
       `
